@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.metadata.query.service.hiveJdbc;
+package org.apache.linkis.metadata.query.service.hivejdbc;
 
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.utils.SecurityUtils;

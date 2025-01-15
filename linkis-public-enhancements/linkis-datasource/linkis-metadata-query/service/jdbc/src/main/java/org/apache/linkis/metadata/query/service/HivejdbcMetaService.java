@@ -24,7 +24,7 @@ import org.apache.linkis.metadata.query.common.exception.MetaRuntimeException;
 import org.apache.linkis.metadata.query.common.service.AbstractDbMetaService;
 import org.apache.linkis.metadata.query.common.service.MetadataConnection;
 import org.apache.linkis.metadata.query.service.conf.SqlParamsMapper;
-import org.apache.linkis.metadata.query.service.hiveJdbc.SqlConnection;
+import org.apache.linkis.metadata.query.service.hivejdbc.SqlConnection;
 
 import org.apache.commons.lang3.StringUtils;
 
