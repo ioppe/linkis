@@ -101,7 +101,9 @@ public class MetaClassLoaderManager {
     }
     if (needToLoad) {
       MetaServiceInstance finalServiceInstance1 = serviceInstance;
-      boolean isContains = CacheConfiguration.MYSQL_RELATIONSHIP_LIST.getValue().contains(dsType);
+      //当dstype为hive时，不需要加载mysql的元数据服务
+      //boolean isContains = CacheConfiguration.MYSQL_RELATIONSHIP_LIST.getValue().contains(dsType);
+      boolean isContains = dsType.equals("hive") ? false : CacheConfiguration.MYSQL_RELATIONSHIP_LIST.getValue().contains(dsType);
       String finalBaseType = isContains ? MYSQL_BASE_DIR : dsType;
       serviceInstance =
           metaServiceInstances.compute(
