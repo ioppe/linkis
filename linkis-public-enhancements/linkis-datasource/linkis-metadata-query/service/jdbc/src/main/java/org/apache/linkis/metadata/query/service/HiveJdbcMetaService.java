@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class HiveMetaService extends AbstractDbMetaService<SqlConnection> {
+public class HiveJdbcMetaService extends AbstractDbMetaService<SqlConnection> {
   @Override
   public MetadataConnection<SqlConnection> getConnection(
       String operator, Map<String, Object> params) throws Exception {
@@ -67,7 +67,7 @@ public class HiveMetaService extends AbstractDbMetaService<SqlConnection> {
       }
     }
     assert extraParams != null;
-    return new MetadataConnection<>(
+      return new MetadataConnection<>(
         new SqlConnection(host, port, username, password, database, extraParams));
   }
 
