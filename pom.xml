@@ -355,7 +355,6 @@
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>${mysql.connector.version}</version>
-        <scope>${mysql.connector.scope}</scope>
       </dependency>
 
       <dependency>
