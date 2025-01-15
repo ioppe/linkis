@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class HiveJdbcMetaService extends AbstractDbMetaService<SqlConnection> {
+public class HivejdbcMetaService extends AbstractDbMetaService<SqlConnection> {
   @Override
   public MetadataConnection<SqlConnection> getConnection(
       String operator, Map<String, Object> params) throws Exception {
