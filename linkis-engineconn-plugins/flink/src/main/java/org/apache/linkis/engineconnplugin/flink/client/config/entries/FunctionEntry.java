@@ -20,9 +20,11 @@ package org.apache.linkis.engineconnplugin.flink.client.config.entries;
 import org.apache.linkis.engineconnplugin.flink.client.config.ConfigUtil;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
-import org.apache.flink.table.descriptors.FunctionDescriptor;
+import org.apache.flink.table.factories.FunctionDefinitionFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /** Describes a user-defined function configuration entry. */
@@ -44,9 +46,6 @@ public class FunctionEntry extends ConfigEntry {
         return name;
     }
 
-    public FunctionDescriptor getDescriptor() {
-        return new FunctionEntryDescriptor();
-    }
 
     public static FunctionEntry create(Map<String, Object> config) {
         return create(ConfigUtil.normalizeYaml(config));
@@ -63,11 +62,4 @@ public class FunctionEntry extends ConfigEntry {
         return new FunctionEntry(name, cleanedProperties);
     }
 
-    private class FunctionEntryDescriptor extends FunctionDescriptor {
-
-        @Override
-        public Map<String, String> toProperties() {
-            return FunctionEntry.this.properties.asMap();
-        }
-    }
 }

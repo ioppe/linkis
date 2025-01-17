@@ -81,6 +81,8 @@ public class ExecutionEntry extends ConfigEntry {
 
   private static final String EXECUTION_PARALLELISM = "parallelism";
 
+  private static final String EXECUTION_MAX_TABLE_RESULT_ROWS = "max-table-result-rows";
+
   private static final String EXECUTION_MAX_PARALLELISM = "max-parallelism";
 
   public static final String EXECUTION_RESULT_MODE = "result-mode";
@@ -164,15 +166,6 @@ public class ExecutionEntry extends ConfigEntry {
       builder.inStreamingMode();
     } else if (inBatchMode()) {
       builder.inBatchMode();
-    }
-
-    final String planner =
-        properties.getOptionalString(EXECUTION_PLANNER).orElse(EXECUTION_PLANNER_VALUE_OLD);
-
-    if (planner.equals(EXECUTION_PLANNER_VALUE_OLD)) {
-      builder.useOldPlanner();
-    } else if (planner.equals(EXECUTION_PLANNER_VALUE_BLINK)) {
-      builder.useBlinkPlanner();
     }
 
     return builder.build();
@@ -278,6 +271,12 @@ public class ExecutionEntry extends ConfigEntry {
     return properties
         .getOptionalInt(EXECUTION_MAX_PARALLELISM)
         .orElseGet(() -> useDefaultValue(EXECUTION_MAX_PARALLELISM, 128));
+  }
+
+  public int getMaxTableResultRows() {
+    return properties
+            .getOptionalInt(EXECUTION_MAX_TABLE_RESULT_ROWS)
+            .orElseGet(() -> useDefaultValue(EXECUTION_MAX_TABLE_RESULT_ROWS, 1_000_000));
   }
 
   public RestartStrategies.RestartStrategyConfiguration getRestartStrategy() {
