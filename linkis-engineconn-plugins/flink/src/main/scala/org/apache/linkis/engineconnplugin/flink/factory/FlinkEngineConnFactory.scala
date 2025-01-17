@@ -17,14 +17,16 @@
 
 package org.apache.linkis.engineconnplugin.flink.factory
 
-import org.apache.linkis.common.conf.CommonVars
 import org.apache.linkis.common.utils.{ClassUtils, Logging}
 import org.apache.linkis.engineconn.acessible.executor.conf.AccessibleExecutorConfiguration
 import org.apache.linkis.engineconn.common.creation.EngineCreationContext
 import org.apache.linkis.engineconn.launch.EngineConnServer
+import org.apache.linkis.engineconnplugin.flink.client.config.FlinkVersionThreadLocal
+import org.apache.linkis.engineconnplugin.flink.client.context.ExecutionContext
 import org.apache.linkis.engineconnplugin.flink.client.config.Environment
 import org.apache.linkis.engineconnplugin.flink.client.config.entries.ExecutionEntry
-import org.apache.linkis.engineconnplugin.flink.client.context.ExecutionContext
+import org.apache.linkis.engineconnplugin.flink.errorcode.FlinkErrorCodeSummary._
+import org.apache.linkis.engineconnplugin.flink.exception.FlinkInitFailedException
 import org.apache.linkis.engineconnplugin.flink.config.{
   FlinkEnvConfiguration,
   FlinkExecutionTargetType
@@ -32,10 +34,8 @@ import org.apache.linkis.engineconnplugin.flink.config.{
 import org.apache.linkis.engineconnplugin.flink.config.FlinkEnvConfiguration._
 import org.apache.linkis.engineconnplugin.flink.config.FlinkResourceConfiguration._
 import org.apache.linkis.engineconnplugin.flink.context.{EnvironmentContext, FlinkEngineConnContext}
-import org.apache.linkis.engineconnplugin.flink.errorcode.FlinkErrorCodeSummary._
-import org.apache.linkis.engineconnplugin.flink.exception.FlinkInitFailedException
 import org.apache.linkis.engineconnplugin.flink.setting.Settings
-import org.apache.linkis.engineconnplugin.flink.util.{ClassUtil, ManagerUtil}
+import org.apache.linkis.engineconnplugin.flink.util.{ClassUtil, FlinkValueFormatUtil, ManagerUtil}
 import org.apache.linkis.governance.common.conf.GovernanceCommonConf
 import org.apache.linkis.manager.engineplugin.common.conf.EnvConfiguration
 import org.apache.linkis.manager.engineplugin.common.creation.{
@@ -45,9 +45,9 @@ import org.apache.linkis.manager.engineplugin.common.creation.{
 import org.apache.linkis.manager.label.entity.Label
 import org.apache.linkis.manager.label.entity.engine._
 import org.apache.linkis.manager.label.entity.engine.EngineType.EngineType
-import org.apache.linkis.protocol.utils.TaskUtils
 
 import org.apache.commons.lang3.StringUtils
+import org.apache.flink.api.common.RuntimeExecutionMode
 import org.apache.flink.configuration._
 import org.apache.flink.kubernetes.configuration.KubernetesConfigOptions
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings
@@ -55,7 +55,7 @@ import org.apache.flink.streaming.api.CheckpointingMode
 import org.apache.flink.streaming.api.environment.CheckpointConfig.ExternalizedCheckpointCleanup
 import org.apache.flink.yarn.configuration.{YarnConfigOptions, YarnDeploymentTarget}
 
-import java.io.File
+import java.io.{File, FileNotFoundException}
 import java.net.URL
 import java.text.MessageFormat
 import java.time.Duration
@@ -63,8 +63,10 @@ import java.util
 import java.util.{Collections, Locale}
 
 import scala.collection.JavaConverters._
+import scala.io.Source
 
 import com.google.common.collect.{Lists, Sets}
+import org.yaml.snakeyaml.Yaml
 
 class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging {
 
@@ -108,6 +110,7 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
     val flinkHome = FLINK_HOME.getValue(options)
     val flinkConfDir = FLINK_CONF_DIR.getValue(options)
     val flinkProvidedLibPath = FLINK_PROVIDED_LIB_PATH.getValue(options)
+    val flinkVersion = FlinkEnvConfiguration.FLINK_VERSION.getValue(options)
     val flinkDistJarPath = FLINK_DIST_JAR_PATH.getValue(options)
     // Local lib path
     val providedLibDirsArray = FLINK_LIB_LOCAL_PATH.getValue(options).split(",")
@@ -138,6 +141,7 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
       shipDirsArray,
       new util.ArrayList[URL],
       flinkExecutionTarget,
+      flinkVersion,
       otherParams
     )
     // Step1: environment-level configurations
@@ -188,7 +192,15 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
     flinkConfig.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, numberOfTaskSlots)
     // set extra configs
     options.asScala.filter { case (key, _) => key.startsWith(FLINK_CONFIG_PREFIX) }.foreach {
-      case (key, value) => flinkConfig.setString(key.substring(FLINK_CONFIG_PREFIX.length), value)
+      case (key, value) =>
+        var flinkConfigValue = value
+        if (
+          FlinkEnvConfiguration.FLINK_YAML_MERGE_ENABLE.getValue && key
+            .equals(FLINK_CONFIG_PREFIX + FLINK_ENV_JAVA_OPTS.getValue)
+        ) {
+          flinkConfigValue = getExtractJavaOpts(value)
+        }
+        flinkConfig.setString(key.substring(FLINK_CONFIG_PREFIX.length), flinkConfigValue)
     }
     // set kerberos config
     if (FLINK_KERBEROS_ENABLE.getValue(options)) {
@@ -285,6 +297,44 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
       }
     }
     context
+  }
+
+  private def getExtractJavaOpts(envJavaOpts: String): String = {
+    var defaultJavaOpts = ""
+    val yamlFilePath = FLINK_CONF_DIR.getValue
+    val yamlFile = yamlFilePath + "/" + FLINK_CONF_YAML.getHotValue()
+    if (new File(yamlFile).exists()) {
+      val source = Source.fromFile(yamlFile)
+      try {
+        val yamlContent = source.mkString
+        val yaml = new Yaml()
+        val configMap = yaml.loadAs(yamlContent, classOf[util.LinkedHashMap[String, Object]])
+        if (configMap.containsKey(FLINK_ENV_JAVA_OPTS.getValue)) {
+          defaultJavaOpts = configMap.get(FLINK_ENV_JAVA_OPTS.getValue).toString
+        }
+      } finally {
+        source.close()
+      }
+    } else {
+      val inputStream = getClass.getResourceAsStream(yamlFile)
+      if (inputStream != null) {
+        val source = Source.fromInputStream(inputStream)
+        try {
+          val yamlContent = source.mkString
+          val yaml = new Yaml()
+          val configMap = yaml.loadAs(yamlContent, classOf[util.LinkedHashMap[String, Object]])
+          if (configMap.containsKey(FLINK_ENV_JAVA_OPTS.getValue)) {
+            defaultJavaOpts = configMap.get(FLINK_ENV_JAVA_OPTS.getValue).toString
+          }
+        } finally {
+          source.close()
+        }
+      } else {
+        throw new FileNotFoundException("YAML file not found in both file system and classpath.")
+      }
+    }
+    val merged = FlinkValueFormatUtil.mergeAndDeduplicate(defaultJavaOpts, envJavaOpts)
+    merged
   }
 
   protected def isOnceEngineConn(labels: util.List[Label[_]]): Boolean = {
@@ -391,10 +441,18 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
           )
         }
         val properties = new util.HashMap[String, String]
-        properties.put(
-          Environment.EXECUTION_ENTRY + "." + ExecutionEntry.EXECUTION_PLANNER,
-          planner
+
+        environmentContext.getFlinkConfig.set(
+          ExecutionOptions.RUNTIME_MODE,
+          RuntimeExecutionMode.STREAMING
         )
+        if (executionType.equalsIgnoreCase(ExecutionEntry.EXECUTION_TYPE_VALUE_BATCH)) {
+          environmentContext.getFlinkConfig.set(
+            ExecutionOptions.RUNTIME_MODE,
+            RuntimeExecutionMode.BATCH
+          )
+        }
+
         properties.put(
           Environment.EXECUTION_ENTRY + "." + ExecutionEntry.EXECUTION_TYPE,
           executionType
@@ -420,12 +478,15 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
         logger.error(s"Not supported YarnDeploymentTarget ${t}.")
         throw new FlinkInitFailedException(NOT_SUPPORTED_YARNTARGET.getErrorDesc + s" ${t}.")
     }
+
+    val flinkVersion = FLINK_VERSION.getValue
     val executionContext = ExecutionContext
       .builder(
         environmentContext.getDefaultEnv,
         environment,
         environmentContext.getDependencies,
-        environmentContext.getFlinkConfig
+        environmentContext.getFlinkConfig,
+        flinkVersion
       )
       .build()
     if (FLINK_CHECK_POINT_ENABLE.getValue(options)) {

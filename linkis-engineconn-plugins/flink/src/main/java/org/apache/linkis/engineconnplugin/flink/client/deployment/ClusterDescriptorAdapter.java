@@ -113,13 +113,13 @@ public abstract class ClusterDescriptorAdapter implements Closeable {
     Supplier<CompletableFuture<String>> function;
     switch (mode) {
       case "trigger":
-        function = () -> clusterClient.triggerSavepoint(jobId, savepoint);
+        function = () -> executionContext.triggerSavepoint(clusterClient, jobId, savepoint);
         break;
       case "cancel":
-        function = () -> clusterClient.cancelWithSavepoint(jobId, savepoint);
+        function = () -> executionContext.cancelWithSavepoint(clusterClient, jobId, savepoint);
         break;
       case "stop":
-        function = () -> clusterClient.stopWithSavepoint(jobId, false, savepoint);
+        function = () -> executionContext.stopWithSavepoint(clusterClient, jobId, false, savepoint);
         break;
       default:
         throw new JobExecutionException(NOT_SAVEPOINT_MODE.getErrorDesc() + mode);

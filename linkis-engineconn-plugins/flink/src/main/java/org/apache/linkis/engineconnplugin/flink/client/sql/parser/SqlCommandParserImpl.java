@@ -151,7 +151,10 @@ public class SqlCommandParserImpl implements SqlCommandParser {
       operands = new String[0];
     } else if (node instanceof SqlCreateDatabase) {
       cmd = SqlCommand.CREATE_DATABASE;
-      operands = new String[] {stmt};
+      operands = new String[]{stmt};
+    } else if (node instanceof SqlCreateFunction) {
+        cmd = SqlCommand.CREATE_FUNCTION;
+        operands = new String[] {stmt};
     } else if (node instanceof SqlDropDatabase) {
       cmd = SqlCommand.DROP_DATABASE;
       operands = new String[] {stmt};

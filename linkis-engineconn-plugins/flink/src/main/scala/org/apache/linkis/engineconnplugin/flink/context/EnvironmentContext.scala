@@ -19,7 +19,10 @@ package org.apache.linkis.engineconnplugin.flink.context
 
 import org.apache.linkis.engineconnplugin.flink.client.config.Environment
 import org.apache.linkis.engineconnplugin.flink.client.factory.LinkisYarnClusterClientFactory
-import org.apache.linkis.engineconnplugin.flink.config.FlinkExecutionTargetType
+import org.apache.linkis.engineconnplugin.flink.config.{
+  FlinkEnvConfiguration,
+  FlinkExecutionTargetType
+}
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.flink.configuration.{
@@ -50,6 +53,8 @@ class EnvironmentContext(
 
   private var flinkConfig: Configuration = _
 
+  private var flinkVersion: String = FlinkEnvConfiguration.FLINK_VERSION.getValue
+
   private var deploymentTarget: String = YarnDeploymentTarget.PER_JOB.getName
 
   private var extraParams: util.Map[String, Any] = _
@@ -66,6 +71,7 @@ class EnvironmentContext(
       shipDirsArray: Array[String],
       dependencies: util.List[URL],
       flinkExecutionTarget: String,
+      flinkVersion: String,
       extraParams: util.Map[String, Any]
   ) {
     this(
@@ -95,6 +101,7 @@ class EnvironmentContext(
       // other params
       this.extraParams = extraParams
     }
+    this.flinkVersion = flinkVersion
   }
 
   def setDeploymentTarget(deploymentTarget: String): Unit = this.deploymentTarget = deploymentTarget
@@ -114,6 +121,8 @@ class EnvironmentContext(
   def getFlinkLibRemotePath: String = flinkLibRemotePath
 
   def getFlinkConfig: Configuration = flinkConfig
+
+  def getFlinkVersion: String = flinkVersion
 
   def getDefaultEnv: Environment = defaultEnv
 

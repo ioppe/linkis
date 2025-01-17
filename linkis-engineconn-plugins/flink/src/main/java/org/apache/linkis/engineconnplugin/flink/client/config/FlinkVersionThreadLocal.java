@@ -15,17 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.engineconnplugin.flink.util
+package org.apache.linkis.engineconnplugin.flink.client.config;
 
-import org.apache.linkis.common.utils.Logging
-import org.apache.linkis.engineconn.launch.EngineConnServer
-import org.apache.linkis.engineconnplugin.flink.config.FlinkEnvConfiguration
+import org.apache.linkis.engineconnplugin.flink.config.FlinkEnvConfiguration;
 
-object ManagerUtil extends Logging {
+import org.apache.commons.lang3.StringUtils;
 
-  val isManager: Boolean = {
-    val options = EngineConnServer.getEngineCreationContext.getOptions
-    FlinkEnvConfiguration.FLINK_MANAGER_MODE_CONFIG_KEY.getValue(options)
-  }
+public class FlinkVersionThreadLocal {
+    private static ThreadLocal<String> flinkVersion = new ThreadLocal<>();
 
+    public static String getFlinkVersion() {
+        String version = flinkVersion.get();
+        if (StringUtils.isBlank(version)) {
+            version = FlinkEnvConfiguration.FLINK_VERSION().getValue();
+            flinkVersion.set(version);
+        }
+        return version;
+    }
+
+    public static void setFlinkVersion(String version) {
+        flinkVersion.set(version);
+    }
 }

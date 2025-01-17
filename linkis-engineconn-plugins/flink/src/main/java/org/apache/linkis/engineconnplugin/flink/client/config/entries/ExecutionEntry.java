@@ -24,7 +24,7 @@ import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.client.config.ConfigUtil;
+import org.apache.linkis.engineconnplugin.flink.client.config.ConfigUtil;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 
 import java.util.Arrays;
@@ -39,6 +39,9 @@ import org.slf4j.LoggerFactory;
 import static org.apache.linkis.engineconnplugin.flink.client.config.Environment.EXECUTION_ENTRY;
 
 public class ExecutionEntry extends ConfigEntry {
+
+  public static final ExecutionEntry DEFAULT_INSTANCE =
+          new ExecutionEntry(new DescriptorProperties(true));
 
   private static final Logger LOG = LoggerFactory.getLogger(ExecutionEntry.class);
 

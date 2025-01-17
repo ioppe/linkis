@@ -24,7 +24,7 @@ object FlinkEnvConfiguration {
 
   val FLINK_HOME_ENV = "FLINK_HOME"
   val FLINK_CONF_DIR_ENV = "FLINK_CONF_DIR"
-  val FLINK_VERSION = CommonVars("flink.version", "1.12.2")
+  val FLINK_VERSION = CommonVars("flink.version", "1.16.2")
 
   val FLINK_HOME =
     CommonVars("flink.home", CommonVars(FLINK_HOME_ENV, "/appcom/Install/flink").getValue)
@@ -169,5 +169,12 @@ object FlinkEnvConfiguration {
 
   val FLINK_HANDSHAKE_WAIT_TIME_MILLS =
     CommonVars("linkis.flink.handshake.wait.time.mills", 60 * 1000)
+
+  val FLINK_CONF_YAML = CommonVars("flink.conf.yaml.dir", "flink-conf.yaml")
+
+  val FLINK_YAML_MERGE_ENABLE = CommonVars("flink.yaml.merge.enable", true)
+
+  val FLINK_ENV_JAVA_OPTS =
+    CommonVars("flink.env.java.opts", "env.java.opts")
 
 }

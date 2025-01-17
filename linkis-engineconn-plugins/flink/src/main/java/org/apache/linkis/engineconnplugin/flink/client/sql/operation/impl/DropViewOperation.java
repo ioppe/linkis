@@ -24,9 +24,8 @@ import org.apache.linkis.engineconnplugin.flink.client.sql.operation.OperationUt
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.result.ResultSet;
 import org.apache.linkis.engineconnplugin.flink.context.FlinkEngineConnContext;
 import org.apache.linkis.engineconnplugin.flink.exception.SqlExecutionException;
-
-import org.apache.flink.table.client.config.entries.TableEntry;
-import org.apache.flink.table.client.config.entries.ViewEntry;
+import org.apache.linkis.engineconnplugin.flink.client.config.entries.TableEntry;
+import org.apache.linkis.engineconnplugin.flink.client.config.entries.ViewEntry;
 
 import static org.apache.linkis.engineconnplugin.flink.errorcode.FlinkErrorCodeSummary.NOT_EXIST_SESSION;
 

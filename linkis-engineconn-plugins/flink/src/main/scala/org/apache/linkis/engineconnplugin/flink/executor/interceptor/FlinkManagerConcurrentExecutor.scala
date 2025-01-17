@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.engineconnplugin.flink.executor
+package org.apache.linkis.engineconnplugin.flink.executor.interceptor
 
 import org.apache.linkis.common.utils.Logging
 import org.apache.linkis.engineconn.acessible.executor.service.EngineConnConcurrentLockService
@@ -24,6 +24,7 @@ import org.apache.linkis.engineconn.once.executor.OnceExecutorExecutionContext
 import org.apache.linkis.engineconnplugin.flink.client.deployment.ClusterDescriptorAdapter
 import org.apache.linkis.engineconnplugin.flink.config.FlinkLockerServiceHolder
 import org.apache.linkis.engineconnplugin.flink.context.FlinkEngineConnContext
+import org.apache.linkis.engineconnplugin.flink.executor.{FlinkExecutor, FlinkOnceExecutor}
 import org.apache.linkis.engineconnplugin.flink.util.ManagerUtil
 import org.apache.linkis.manager.common.entity.enumeration.NodeStatus
 import org.apache.linkis.scheduler.executer.{
@@ -33,27 +34,27 @@ import org.apache.linkis.scheduler.executer.{
 }
 
 class FlinkManagerConcurrentExecutor(
-    val id: Long,
-    maxRunningNumber: Int,
-    val flinkEngineConnContext: FlinkEngineConnContext
-) extends FlinkOnceExecutor[ClusterDescriptorAdapter]
-    with FlinkExecutor
-    with Logging {
+                                      val id: Long,
+                                      maxRunningNumber: Int,
+                                      val flinkEngineConnContext: FlinkEngineConnContext
+                                    ) extends FlinkOnceExecutor[ClusterDescriptorAdapter]
+  with FlinkExecutor
+  with Logging {
 
   override protected def submit(
-      onceExecutorExecutionContext: OnceExecutorExecutionContext
-  ): Unit = {
+                                 onceExecutorExecutionContext: OnceExecutorExecutionContext
+                               ): Unit = {
     logger.info("Succeed to init FlinkManagerExecutor.")
   }
 
   override def execute(
-      onceExecutorExecutionContext: OnceExecutorExecutionContext
-  ): ExecuteResponse = {
+                        onceExecutorExecutionContext: OnceExecutorExecutionContext
+                      ): ExecuteResponse = {
     val isManager = ManagerUtil.isManager
     val lockService = FlinkLockerServiceHolder.getDefaultLockService()
     if (
-        isManager && null != lockService && lockService
-          .isInstanceOf[EngineConnConcurrentLockService]
+      isManager && null != lockService && lockService
+        .isInstanceOf[EngineConnConcurrentLockService]
     ) {
       val msg = "Succeed to init FlinkManagerExecutor."
       logger.info(msg)
@@ -82,17 +83,17 @@ class FlinkManagerConcurrentExecutor(
   def getFlinkContext(): FlinkEngineConnContext = flinkEngineConnContext
 
   override def doSubmit(
-      onceExecutorExecutionContext: OnceExecutorExecutionContext,
-      options: Map[String, String]
-  ): Unit = submit(onceExecutorExecutionContext)
+                         onceExecutorExecutionContext: OnceExecutorExecutionContext,
+                         options: Map[String, String]
+                       ): Unit = submit(onceExecutorExecutionContext)
 
   override protected def initOnceExecutorExecutionContext(
-      onceExecutorExecutionContext: OnceExecutorExecutionContext
-  ): Unit = {}
+                                                           onceExecutorExecutionContext: OnceExecutorExecutionContext
+                                                         ): Unit = {}
 
   override protected def createOnceExecutorExecutionContext(
-      engineCreationContext: EngineCreationContext
-  ): OnceExecutorExecutionContext = new OnceExecutorExecutionContext(null, null)
+                                                             engineCreationContext: EngineCreationContext
+                                                           ): OnceExecutorExecutionContext = new OnceExecutorExecutionContext(null, null)
 
   override def tryReady(): Boolean = {
     // set default status to Unlock

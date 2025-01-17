@@ -36,7 +36,8 @@ class FlinkEngineConnContext(environmentContext: EnvironmentContext) {
       environmentContext.getDefaultEnv,
       environment,
       environmentContext.getDependencies,
-      environmentContext.getFlinkConfig
+      environmentContext.getFlinkConfig,
+      environmentContext.getFlinkVersion
     )
 
 }

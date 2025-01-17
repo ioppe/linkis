@@ -29,11 +29,11 @@ import org.apache.linkis.engineconnplugin.flink.context.FlinkEngineConnContext;
 import org.apache.linkis.engineconnplugin.flink.exception.SqlExecutionException;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.shaded.guava18.com.google.common.collect.ImmutableMap;
 import org.apache.flink.table.types.logical.VarCharType;
 import org.apache.flink.types.Row;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +79,8 @@ public class SetOperation implements NonJobOperation {
       // TODO avoid to build a new Environment for some cases
       // set a property
       Environment newEnv =
-          Environment.enrich(env, ImmutableMap.of(key.trim(), value.trim()), ImmutableMap.of());
+              Environment.enrich(
+                      env, Collections.singletonMap(key.trim(), value.trim()), Collections.emptyMap());
       ExecutionContext.SessionState sessionState = executionContext.getSessionState();
 
       // Renew the ExecutionContext by new environment.

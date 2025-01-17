@@ -26,6 +26,11 @@ import org.apache.linkis.engineconnplugin.flink.client.deployment.{
   AbstractSessionClusterDescriptorAdapter,
   ClusterDescriptorAdapterFactory
 }
+import org.apache.linkis.engineconnplugin.flink.errorcode.FlinkErrorCodeSummary._
+import org.apache.linkis.engineconnplugin.flink.exception.{
+  ExecutorInitException,
+  SqlParseException
+}
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.{
   AbstractJobOperation,
   JobOperation,
@@ -39,8 +44,6 @@ import org.apache.linkis.engineconnplugin.flink.config.{
   FlinkExecutionTargetType
 }
 import org.apache.linkis.engineconnplugin.flink.context.FlinkEngineConnContext
-import org.apache.linkis.engineconnplugin.flink.errorcode.FlinkErrorCodeSummary._
-import org.apache.linkis.engineconnplugin.flink.exception.{ExecutorInitException, SqlParseException}
 import org.apache.linkis.engineconnplugin.flink.listener.{
   FlinkStreamingResultSetListener,
   InteractiveFlinkStatusListener
@@ -124,9 +127,9 @@ class FlinkSQLComputationExecutor(
   ): ExecuteResponse = {
     val callOpt = SqlCommandParser.getSqlCommandParser.parse(code.trim, true)
     val callSQL =
-      if (!callOpt.isPresent)
+      if (!callOpt.isPresent) {
         throw new SqlParseException(MessageFormat.format(UNKNOWN_STATEMENT.getErrorDesc, code))
-      else callOpt.get
+      } else callOpt.get
     RelMetadataQueryBase.THREAD_PROVIDERS.set(
       JaninoRelMetadataProvider.of(FlinkDefaultRelMetadataProvider.INSTANCE)
     )
@@ -231,6 +234,11 @@ class FlinkSQLComputationExecutor(
     flinkEngineConnContext.getExecutionContext.createClusterDescriptor().close()
     flinkEngineConnContext.getExecutionContext.getClusterClientFactory.close()
     super.close()
+  }
+
+  override def tryShutdown(): Boolean = {
+    Utils.tryAndWarn(close())
+    super.tryShutdown()
   }
 
 }

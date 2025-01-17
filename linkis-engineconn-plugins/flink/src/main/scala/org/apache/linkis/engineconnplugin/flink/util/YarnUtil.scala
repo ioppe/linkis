@@ -21,12 +21,12 @@ import org.apache.linkis.common.exception.ErrorException
 import org.apache.linkis.common.utils.Logging
 import org.apache.linkis.engineconn.core.executor.ExecutorManager
 import org.apache.linkis.engineconn.executor.entity.YarnExecutor
+import org.apache.linkis.engineconnplugin.flink.client.config.FlinkVersionThreadLocal
 import org.apache.linkis.engineconnplugin.flink.config.FlinkEnvConfiguration
 import org.apache.linkis.engineconnplugin.flink.exception.JobExecutionException
 import org.apache.linkis.governance.common.conf.GovernanceCommonConf
 import org.apache.linkis.governance.common.constant.ec.ECConstants
 import org.apache.linkis.manager.common.entity.enumeration.NodeStatus
-
 import org.apache.commons.lang3.StringUtils
 import org.apache.flink
 import org.apache.flink.client.program.rest.RestClusterClient
@@ -34,18 +34,13 @@ import org.apache.flink.configuration.{HighAvailabilityOptions, JobManagerOption
 import org.apache.flink.runtime.client.JobStatusMessage
 import org.apache.flink.yarn.configuration.YarnConfigOptions
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.yarn.api.records.{
-  ApplicationId,
-  ApplicationReport,
-  FinalApplicationStatus,
-  YarnApplicationState
-}
+import org.apache.hadoop.yarn.api.records.{ApplicationId, ApplicationReport, FinalApplicationStatus, YarnApplicationState}
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
+import org.apache.linkis.engineconnplugin.flink.client.context.ExecutionContext
 
 import java.util
-
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.collection.mutable.ArrayBuffer
 
@@ -159,7 +154,10 @@ object YarnUtil extends Logging {
         val msg = s"App : ${appIdStr} got no head job, cannot do checkPoint and cancel."
         throw new JobExecutionException(msg)
       }
-      val rs = restClient.triggerSavepoint(firstJob.getJobId, checkPointPath).get()
+//      val rs = restClient.triggerSavepoint(firstJob.getJobId, checkPointPath).get()
+      val rs = ExecutionContext.getInstance(FlinkVersionThreadLocal.getFlinkVersion)
+        .triggerSavepoint(restClient, firstJob.getJobId, checkPointPath)
+        .get()
       rs
     }
   }
