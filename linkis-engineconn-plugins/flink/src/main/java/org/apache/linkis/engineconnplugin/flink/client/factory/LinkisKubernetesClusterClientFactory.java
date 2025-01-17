@@ -79,14 +79,12 @@ public class LinkisKubernetesClusterClientFactory extends KubernetesClusterClien
     try {
       flinkKubeClient.stopAndCleanupCluster(clusterId);
     } catch (Exception e) {
-      flinkKubeClient.handleException(e);
       LOG.error("Could not kill Kubernetes cluster " + clusterId);
     }
 
     try {
       flinkKubeClient.close();
     } catch (Exception e) {
-      flinkKubeClient.handleException(e);
       LOG.error("failed to close client, exception {}", e.toString());
     }
   }
