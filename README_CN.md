@@ -1,3 +1,7 @@
+<p align="center">
+由于dss1.2.1支持的linkis1.4.0，此仓库基于Apache Linkis 1.4.0版本进行修改
+</p>
+---
 <h2 align="center">
   Apache Linkis
 </h2>
