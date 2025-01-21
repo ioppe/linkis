@@ -54,7 +54,7 @@ class FlinkEngineConnLaunchBuilder extends JavaProcessEngineConnLaunchBuilder {
     val properties = engineConnBuildRequest.engineConnCreationDesc.properties
     properties.put(
       EnvConfiguration.ENGINE_CONN_MEMORY.key,
-      FlinkResourceConfiguration.LINKIS_FLINK_CLIENT_MEMORY.getValue(properties) + "M"
+      FlinkResourceConfiguration.LINKIS_FLINK_CLIENT_MEMORY.getValue(properties)
     )
     super.getCommands
   }

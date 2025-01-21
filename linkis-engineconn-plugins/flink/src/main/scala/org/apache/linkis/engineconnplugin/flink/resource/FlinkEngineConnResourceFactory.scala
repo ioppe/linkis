@@ -44,13 +44,13 @@ class FlinkEngineConnResourceFactory extends AbstractEngineResourceFactory {
       )
     }
     val yarnMemory = ByteTimeUtils.byteStringAsBytes(
-      LINKIS_FLINK_TASK_MANAGER_MEMORY.getValue(properties) * containers + "M"
+      LINKIS_FLINK_TASK_MANAGER_MEMORY.getValue(properties) * containers
     ) +
-      ByteTimeUtils.byteStringAsBytes(LINKIS_FLINK_JOB_MANAGER_MEMORY.getValue(properties) + "M")
+      ByteTimeUtils.byteStringAsBytes(LINKIS_FLINK_JOB_MANAGER_MEMORY.getValue(properties))
     val yarnCores = LINKIS_FLINK_TASK_MANAGER_CPU_CORES.getValue(properties) * containers + 1
     new DriverAndYarnResource(
       new LoadInstanceResource(
-        ByteTimeUtils.byteStringAsBytes(LINKIS_FLINK_CLIENT_MEMORY.getValue(properties) + "M"),
+        ByteTimeUtils.byteStringAsBytes(LINKIS_FLINK_CLIENT_MEMORY.getValue(properties)),
         LINKIS_FLINK_CLIENT_CORES,
         1
       ),

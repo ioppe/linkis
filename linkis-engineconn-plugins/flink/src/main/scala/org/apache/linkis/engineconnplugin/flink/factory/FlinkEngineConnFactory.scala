@@ -148,8 +148,8 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
     val jobName = options.getOrDefault("flink.app.name", "EngineConn-Flink")
     val yarnQueue = LINKIS_QUEUE_NAME.getValue(options)
     val parallelism = FLINK_APP_DEFAULT_PARALLELISM.getValue(options)
-    val jobManagerMemory = LINKIS_FLINK_JOB_MANAGER_MEMORY.getValue(options) + "M"
-    val taskManagerMemory = LINKIS_FLINK_TASK_MANAGER_MEMORY.getValue(options) + "M"
+    val jobManagerMemory = LINKIS_FLINK_JOB_MANAGER_MEMORY.getValue(options)
+    val taskManagerMemory = LINKIS_FLINK_TASK_MANAGER_MEMORY.getValue(options)
     val numberOfTaskSlots = LINKIS_FLINK_TASK_SLOTS.getValue(options)
     logger.info(
       s"Use yarn queue $yarnQueue, and set parallelism = $parallelism, jobManagerMemory = $jobManagerMemory, taskManagerMemory = $taskManagerMemory, numberOfTaskSlots = $numberOfTaskSlots."
