@@ -119,7 +119,7 @@ trait FlinkExecutor
     val yarnCores =
       FlinkResourceConfiguration.LINKIS_FLINK_TASK_MANAGER_CPU_CORES.getValue * containers + 1
     val resource = new DriverAndYarnResource(
-      new LoadInstanceResource(OverloadUtils.getProcessMaxMemory, LINKIS_FLINK_CLIENT_CORES, 1),
+      new LoadInstanceResource(OverloadUtils.getProcessMaxMemory, LINKIS_FLINK_CLIENT_CORES.getValue, 1),
       new YarnResource(yarnMemory, yarnCores, 0, queue)
     )
     val engineResource = new CommonNodeResource

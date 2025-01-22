@@ -22,16 +22,16 @@ import org.apache.linkis.common.conf.CommonVars
 object FlinkResourceConfiguration {
 
   // Unit: G(单位为G)
-  val LINKIS_FLINK_CLIENT_MEMORY = CommonVars[Int]("flink.client.memory", "1g")
+  val LINKIS_FLINK_CLIENT_MEMORY = CommonVars[String]("flink.client.memory", "1g")
 
   // Fixed to 1（固定为1） CommonVars[Int]("wds.linkis.driver.cores", 1)
   val LINKIS_FLINK_CLIENT_CORES = CommonVars[Int]("flink.client.cores", 1)
 
   // Unit: G(单位为G)
-  val LINKIS_FLINK_JOB_MANAGER_MEMORY = CommonVars[Int]("flink.jobmanager.memory", "1g")
+  val LINKIS_FLINK_JOB_MANAGER_MEMORY = CommonVars[String]("flink.jobmanager.memory", "1g")
 
   // Unit: M(单位为M)
-  val LINKIS_FLINK_TASK_MANAGER_MEMORY = CommonVars[Int]("flink.taskmanager.memory", "4g")
+  val LINKIS_FLINK_TASK_MANAGER_MEMORY = CommonVars[String]("flink.taskmanager.memory", "4g")
   val LINKIS_FLINK_TASK_SLOTS = CommonVars[Int]("flink.taskmanager.numberOfTaskSlots", 2)
   val LINKIS_FLINK_TASK_MANAGER_CPU_CORES = CommonVars[Int]("flink.taskmanager.cpu.cores", 2)
   val LINKIS_FLINK_CONTAINERS = CommonVars[Int]("flink.container.num", 2)

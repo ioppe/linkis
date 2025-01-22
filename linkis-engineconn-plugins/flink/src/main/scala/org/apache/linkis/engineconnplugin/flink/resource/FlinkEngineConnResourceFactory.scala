@@ -51,7 +51,7 @@ class FlinkEngineConnResourceFactory extends AbstractEngineResourceFactory {
     new DriverAndYarnResource(
       new LoadInstanceResource(
         ByteTimeUtils.byteStringAsBytes(LINKIS_FLINK_CLIENT_MEMORY.getValue(properties)),
-        LINKIS_FLINK_CLIENT_CORES,
+        LINKIS_FLINK_CLIENT_CORES.getValue(properties),
         1
       ),
       new YarnResource(yarnMemory, yarnCores, 0, LINKIS_QUEUE_NAME.getValue(properties))
