@@ -32,10 +32,11 @@ public class CacheConfiguration {
       CommonVars.apply("wds.linkis.server.mdm.service.cache.in-pool.size", 5);
 
   //添加hiveJdbc
+  //添加druid
   public static final CommonVars<String> MYSQL_RELATIONSHIP_LIST =
       CommonVars.apply(
           "wds.linkis.server.mdq.mysql.relationship",
-          "mysql,oracle,kingbase,postgresql,sqlserver,db2,greenplum,dm,doris,clickhouse,tidb,starrocks,gaussdb,oceanbase,hivejdbc");
+          "mysql,oracle,kingbase,postgresql,sqlserver,db2,greenplum,dm,doris,clickhouse,tidb,starrocks,gaussdb,oceanbase,hivejdbc,druid");
 
   public static final CommonVars<String> QUERY_DATABASE_RELATIONSHIP =
       CommonVars.apply(
