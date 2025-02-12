@@ -61,6 +61,14 @@
       <version>3.1.2</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.apache.calcite.avatica/avatica-core -->
+    <dependency>
+      <groupId>org.apache.calcite.avatica</groupId>
+      <artifactId>avatica-core</artifactId>
+      <version>1.23.0</version>
+    </dependency>
+
+
     <dependency>
       <groupId>com.clickhouse</groupId>
       <artifactId>clickhouse-jdbc</artifactId>
