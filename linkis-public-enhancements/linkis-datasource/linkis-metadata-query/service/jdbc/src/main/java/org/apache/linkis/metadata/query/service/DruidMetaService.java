@@ -76,7 +76,7 @@ public class DruidMetaService extends AbstractDbMetaService<SqlConnection> {
         try {
             return connection.getAllDatabases();
         } catch (SQLException e) {
-            throw new RuntimeException("Fail to get Hive databases(获取数据库列表失败)", e);
+            throw new RuntimeException("Fail to get druid databases(获取数据库列表失败)", e);
         }
     }
 
@@ -87,7 +87,7 @@ public class DruidMetaService extends AbstractDbMetaService<SqlConnection> {
         try {
             return connection.getColumns(database, table);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException("Fail to get Hive columns(获取字段列表失败)", e);
+            throw new RuntimeException("Fail to get druid columns(获取字段列表失败)", e);
         }
     }
 
